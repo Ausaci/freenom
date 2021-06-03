@@ -1,0 +1,33 @@
+name: build docker
+on:
+  workflow_dispatch:
+  #schedule:
+   # - cron: 35 21 * * 4
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: docker
+        
+      - name: Install build dependencies
+        run: |
+          df -h
+
+      - name: login docker
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          #启用 buildx 插件
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+          docker buildx create --use --name mybuilder
+          docker buildx inspect mybuilder --bootstrap
+          docker buildx ls
+
+      - name: Build Docker gimls
+        run: |
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/freenom --platform=linux/amd64,linux/arm,linux/arm64 . --push
