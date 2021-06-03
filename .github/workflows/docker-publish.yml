@@ -28,6 +28,6 @@ jobs:
           docker buildx inspect mybuilder --bootstrap
           docker buildx ls
 
-      - name: Build Docker gimls
+      - name: Build Docker
         run: |
           docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/freenom --platform=linux/amd64,linux/arm,linux/arm64 . --push
